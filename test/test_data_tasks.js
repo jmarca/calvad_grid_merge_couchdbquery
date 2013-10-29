@@ -9,6 +9,7 @@ var cdb_interactions = require('../lib/couchdb_interactions')
 var filter_grids = cdb_interactions.filter_out_done
 var mark_done = cdb_interactions.mark_done
 var in_process = cdb_interactions.mark_in_process
+var get_hpms_fractions = cdb_interactions.get_hpms_fractions
 
 var get_detector_routes = require('../lib/query_postgres').get_detector_route_nums
 var fs = require('fs')
@@ -34,6 +35,8 @@ function create_tempdb(task,cb){
     })
 }
 var total_docs = 0
+var hpms_docs=0
+var detector_docs=0
 
 function load_hpms(task,cb){
     var db_dump = require('./files/100_223_2008_JAN.json')
@@ -43,6 +46,7 @@ function load_hpms(task,cb){
                          return row.doc
                      })
     total_docs += docs.length
+    hpms_docs = docs.length
     var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
               ,task.options.couchdb.db].join('/')
     var couch =  cdb
@@ -70,6 +74,7 @@ function load_detector(task,cb){
                          return row.doc
                      })
     total_docs += docs.length
+    detector_docs = docs.length
     var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
               ,task.options.couchdb.db].join('/')
     var couch = cdb
@@ -144,7 +149,20 @@ after(function(done){
 
 describe('get hpms fractions',function(){
 
-    it('can get data for a known grid')
+    it('can get data for a known grid',function(done){
+        task.options.couchdb.hpms_fractions_db=task.options.couchdb.db
+        task.cell_id='100_223'
+        task.year=2008
+        get_hpms_fractions(task,function(err,task){
+            should.not.exist(err)
+            should.exist(task)
+            task.should.have.property('hpms_fractions')
+            _.keys(task.hpms_fractions).should.have.lengthOf(hpms_docs)
+            task.should.have.property('hpms_fractions_sums')
+            task.should.have.property('hpms_fractions_hours')
+            return done()
+        })
+    })
 
     it('will not crash if an unkown grid is passed in')
 
