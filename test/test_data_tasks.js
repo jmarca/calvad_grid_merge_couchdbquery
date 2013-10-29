@@ -122,7 +122,6 @@ before(function(done){
                    }
                   ,function(){
                        task.options.couchdb.db=datadb
-                       console.log('created dbs')
                        async.series([function(cb){
                                            load_hpms(task,cb)
                                            return null
@@ -244,5 +243,31 @@ describe('get detector fractions',function(){
         })
     })
 
+    it('will merge multiple grid cells by time',function(done){
+        task.options.couchdb.detector_fractions_db=task.options.couchdb.db
+        task.cell_id='189_72'
+        task.year=2008
+        get_detector_fractions(task,function(err,task){
+            should.not.exist(err)
+            should.exist(task)
+            task.should.have.property('detector_fractions_sums')
+            // just repeat the same grid cell for the test
+            var sums=_.clone(task.detector_fractions_sums)
+            var hours=_.clone(task.detector_fractions_hours)
+            get_detector_fractions(task,function(err,task){
+                should.not.exist(err)
+                should.exist(task)
+                task.should.have.property('detector_fractions')
+                task.should.have.property('detector_fractions_sums')
+                _.each(task.detector_fractions_sums
+                      ,function(v,k){
+                           v.should.be.above(sums[k])
+                           return null
+                       })
+                    task.should.have.property('detector_fractions_hours',hours)
+                return done()
+            })
+        })
+    })
 
 })
