@@ -16,12 +16,15 @@ var superagent=require('superagent')
 
 var config_okay = require('../lib/config_okay')
 
-var task,options,created_locally=false;
+var date = new Date()
+var test_db_unique = date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds()
+
+var task,options
 before(function(done){
     config_okay('test.config.json',function(err,c){
         options ={'couchdb':c.couchdb}
-        options.couchdb.db.should.eql('testdb')
-        options.couchdb.statedb.should.eql('teststatedb')
+        options.couchdb.db += test_db_unique
+        options.couchdb.statedb += test_db_unique
 
         // dummy up a done grid and a not done grid in a test db
         task = {'options':options};
@@ -30,20 +33,14 @@ before(function(done){
         async.each([options.couchdb.db,options.couchdb.statedb]
                   ,function(db,cb){
                        var cdb =
-                           [task.options.couchdb.url
+                           [task.options.couchdb.url+':'+task.options.couchdb.port
                            ,db].join('/')
-                       console.log(cdb)
                        superagent.put(cdb)
                        .type('json')
                        .auth(options.couchdb.auth.username
                             ,options.couchdb.auth.password)
                        .end(function(err,result){
 
-                           if(result.error===undefined){
-                               created_locally=true
-                           }else{
-                               console.log(result)
-                           }
                            cb()
                        })
                    }
@@ -53,86 +50,50 @@ before(function(done){
     })
 })
 after(function(done){
-    if(created_locally){
         async.each([options.couchdb.db,options.couchdb.statedb]
                   ,function(db,cb){
                        var cdb =
-                           [task.options.couchdb.url
+                           [task.options.couchdb.url+':'+task.options.couchdb.port
                            ,db].join('/')
-                       console.log(cdb)
                        superagent.del(cdb)
                        .type('json')
                        .auth(options.couchdb.auth.username
                             ,options.couchdb.auth.password)
                        .end(cb)
-                   })
-            return null
-    }else{
-        return done()
-    }
+                   }
+                  ,function(){
+                       done()
+                   });
+    return null
+
 })
+
 
 describe('can mark as inprocess',function(){
-    before(function(done){
-        in_process(task,function(err,state){
-               should.not.exist(err)
-               should.exist(state)
-               state.should.have.length(3)
-               filter_grids(task,function(doit){
-                   should.exist(doit)
-                   doit.should.be.ok;
-                   return done()
-               })
-           })
-    })
-    it('should mark accumulate with array'
+    it('can mark a task and filter it out'
       ,function(done){
-           in_process(task,function(err,state){
+           in_process(task,function(err){
                should.not.exist(err)
-               should.exist(state)
-               state.should.have.length(3)
                filter_grids(task,function(doit){
                    should.exist(doit)
+                   task.state.should.have.length(3)
                    doit.should.not.be.ok;
                    return done()
-               })
-           })
+               });
+               return null
+           });
+           return null
        })
-})
-
-
-
-describe('filter out done grids',function(){
-    var options;
-    before(config_okay('config.json',function(err,c){
-               options ={'couchdb':c.couchdb}
-
-               // dummy up a done grid and a not done grid in a test db
-
-           }))
-
-    it('should return false for a done grid'
+    it('does not filter out other tasks'
       ,function(done){
-           var task={'cell_id':'189_72'
-                    ,'year':2009
-                    ,'options':options}
-           filter_grids(task
-                   ,function(test_result){
-                        should.exist(test_result)
-                        test_result.should.be.ok;
-                        done()
-                    })
-       })
-    it('should return true for a not done grid'
-      ,function(done){
-           var task={'cell_id':'189_72'
-                    ,'year':2009
-                    ,'options':options}
-           filter_grids(task
-                   ,function(test_result){
-                        should.exist(test_result)
-                        test_result.should.not.be.ok;
-                        done()
-                    })
-       })
+           task.cell_id= '178_91'
+           task.state=[]
+           filter_grids(task,function(doit){
+                  should.exist(doit)
+                   task.state.should.have.length(0)
+                   doit.should.be.ok;
+                   return done()
+               });
+               return null
+           });
 })
