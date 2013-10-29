@@ -17,22 +17,33 @@ var superagent=require('superagent')
 var config_okay = require('../lib/config_okay')
 
 var date = new Date()
-var test_db_unique = date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds()
+var test_db_unique = date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds()+'-'+date.getMilliseconds()
 
 var task,options
 
+function create_tempdb(task,cb){
+    var cdb =
+        [task.options.couchdb.url+':'+task.options.couchdb.port
+        ,task.options.couchdb.db].join('/')
+    superagent.put(cdb)
+    .type('json')
+    .auth(options.couchdb.auth.username
+         ,options.couchdb.auth.password)
+    .end(function(err,result){
+        cb()
+    })
+}
+
 function load_hpms(task,cb){
-    var db_dump = require('./test/files/100_223_2008_JAN')
+    var db_dump = require('./files/100_223_2008_JAN.json')
+
     var docs = _.map(db_dump.rows
                     ,function(row){
                          return row.doc
                      })
-
-    var db = task.options.couchdb.db
     var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,db].join('/')
-
-    var couch = 'http://'+cdb
+              ,task.options.couchdb.db].join('/')
+    var couch =  cdb
     superagent.post(couch+'/_bulk_docs')
     .type('json')
     .send({"docs":docs})
@@ -42,17 +53,14 @@ function load_hpms(task,cb){
 }
 
 function load_detector(task,cb){
-    var db_dump = require('./test/files/189_72_2008_JAN')
+    var db_dump = require('./files/189_72_2008_JAN.json')
     var docs = _.map(db_dump.rows
                     ,function(row){
                          return row.doc
                      })
-
-    var db = task.options.couchdb.db
     var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,db].join('/')
-
-    var couch = 'http://'+cdb
+              ,task.options.couchdb.db].join('/')
+    var couch = cdb
     superagent.post(couch+'/_bulk_docs')
     .type('json')
     .send({"docs":docs})
@@ -69,23 +77,26 @@ before(function(done){
 
         // dummy up a done grid and a not done grid in a test db
         task = {'options':options};
-        task.cell_id= '178_92'
-        task.year   = 2007
+        var datadb = options.couchdb.db
         async.each([options.couchdb.db,options.couchdb.statedb]
                   ,function(db,cb){
-                       var cdb =
-                           [task.options.couchdb.url+':'+task.options.couchdb.port
-                           ,db].join('/')
-                       superagent.put(cdb)
-                       .type('json')
-                       .auth(options.couchdb.auth.username
-                            ,options.couchdb.auth.password)
-                       .end(function(err,result){
-
-                           cb()
-                       })
+                       task.options.couchdb.db=db
+                       create_tempdb(task,cb)
+                       return null
                    }
-                  ,done
+                  ,function(){
+                       task.options.couchdb.db=datadb
+                       console.log('created dbs')
+                       async.series([function(cb){
+                                           load_hpms(task,cb)
+                                           return null
+                                       }
+                                      ,function(cb){
+                                           load_detector(task,cb)
+                                           return null
+                                       }]
+                                     ,done)
+                   }
                   );
         return null
     })
@@ -110,31 +121,11 @@ after(function(done){
 })
 
 
-describe('can mark as inprocess',function(){
-    it('can mark a task and filter it out'
-      ,function(done){
-           in_process(task,function(err){
-               should.not.exist(err)
-               filter_grids(task,function(doit){
-                   should.exist(doit)
-                   task.state.should.have.length(3)
-                   doit.should.not.be.ok;
-                   return done()
-               });
-               return null
-           });
-           return null
-       })
-    it('does not filter out other tasks'
-      ,function(done){
-           task.cell_id= '178_91'
-           task.state=[]
-           filter_grids(task,function(doit){
-                  should.exist(doit)
-                   task.state.should.have.length(0)
-                   doit.should.be.ok;
-                   return done()
-               });
-               return null
-           });
+describe('get hpms fractions',function(){
+
+    it('can get data for a known grid')
+
+    it('will not crash if an unkown grid is passed in')
+
+
 })
