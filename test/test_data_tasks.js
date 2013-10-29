@@ -33,6 +33,7 @@ function create_tempdb(task,cb){
         cb()
     })
 }
+var total_docs = 0
 
 function load_hpms(task,cb){
     var db_dump = require('./files/100_223_2008_JAN.json')
@@ -41,6 +42,7 @@ function load_hpms(task,cb){
                     ,function(row){
                          return row.doc
                      })
+    total_docs += docs.length
     var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
               ,task.options.couchdb.db].join('/')
     var couch =  cdb
@@ -48,7 +50,16 @@ function load_hpms(task,cb){
     .type('json')
     .send({"docs":docs})
     .end(function(e,r){
-        return cb(e)
+        superagent.get(couch)
+        .type('json')
+        .end(function(e,r){
+            should.exist(r)
+            r.should.have.property('text')
+            var superagent_sucks = JSON.parse(r.text)
+            superagent_sucks.should.have.property('doc_count',total_docs)
+            return cb()
+        })
+        return null
     })
 }
 
@@ -58,6 +69,7 @@ function load_detector(task,cb){
                     ,function(row){
                          return row.doc
                      })
+    total_docs += docs.length
     var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
               ,task.options.couchdb.db].join('/')
     var couch = cdb
@@ -65,7 +77,16 @@ function load_detector(task,cb){
     .type('json')
     .send({"docs":docs})
     .end(function(e,r){
-        return cb(e)
+        superagent.get(couch)
+        .type('json')
+        .end(function(e,r){
+            should.exist(r)
+            r.should.have.property('text')
+            var superagent_sucks = JSON.parse(r.text)
+            superagent_sucks.should.have.property('doc_count',total_docs)
+            return cb()
+        })
+        return null
     })
 }
 
