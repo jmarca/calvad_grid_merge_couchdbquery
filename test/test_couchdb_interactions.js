@@ -97,3 +97,11 @@ describe('can mark as inprocess',function(){
                return null
            });
 })
+
+describe('get hpms fractions',function(){
+    it('can get data for a known grid')
+
+    it('will not crash if an unkown grid is passed in')
+
+
+})
