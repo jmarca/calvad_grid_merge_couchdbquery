@@ -20,7 +20,7 @@
     "matchdep": "~0.3.0",
     "jshint": "~2.3.0",
     "grunt-contrib-jshint": "~0.6.4",
-    "should": "~2.0.2"
+    "superagent": "~0.15.7"
   },
   "dependencies": {
     "calvad_areas": "git://github.com/jmarca/calvad_areas.git",
@@ -28,9 +28,11 @@
     "couchdb_bulkdoc_saver": "git://github.com/jmarca/couchdb_bulkdoc_saver.git",
     "couch_check_state": "git://github.com/jmarca/couch_check_state.git",
     "couch_set_state": "git://github.com/jmarca/couch_set_state.git",
+    "couchdb_get_views": "git://github.com/jmarca/couchdb_get_views.git",
     "async": "~0.2.9",
     "optimist": "~0.6.0",
     "lodash": "~2.2.1",
-    "pg": "~2.8.2"
+    "pg": "~2.8.2",
+    "should": "~2.0.2"
   }
 }
