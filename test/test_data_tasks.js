@@ -23,87 +23,7 @@ var test_db_unique = date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds()
 
 var task,options
 
-function create_tempdb(task,cb){
-    var cdb =
-        [task.options.couchdb.url+':'+task.options.couchdb.port
-        ,task.options.couchdb.db].join('/')
-    superagent.put(cdb)
-    .type('json')
-    .auth(options.couchdb.auth.username
-         ,options.couchdb.auth.password)
-    .end(function(err,result){
-        cb()
-    })
-}
-var total_docs = 0
-var hpms_docs=0
-var detector_docs=0
-
-function load_hpms(task,cb){
-    async.each(['./files/100_223_2008_JAN.json'
-               ,'./files/178_97_2008_JAN.json']
-              ,function(file,innercb){
-
-                   var db_dump = require(file)
-                   var docs = _.map(db_dump.rows
-                                   ,function(row){
-                                        return row.doc
-                                    })
-                   var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-                             ,task.options.couchdb.db].join('/')
-                   var couch =  cdb
-                   superagent.post(couch+'/_bulk_docs')
-                   .type('json')
-                   .send({"docs":docs})
-                   .end(function(e,r){
-                       total_docs += docs.length
-                       hpms_docs += docs.length
-                       superagent.get(couch)
-                       .type('json')
-                       .end(function(e,r){
-                           should.exist(r)
-                           r.should.have.property('text')
-                           var superagent_sucks = JSON.parse(r.text)
-                           superagent_sucks.should.have
-                           .property('doc_count',total_docs)
-                           return innercb()
-                       })
-                       return null
-                   })
-               }
-              ,function(e){
-                   return cb(e)
-               })
-        return null
-}
-
-function load_detector(task,cb){
-    var db_dump = require('./files/189_72_2008_JAN.json')
-    var docs = _.map(db_dump.rows
-                    ,function(row){
-                         return row.doc
-                     })
-    total_docs += docs.length
-    detector_docs = docs.length
-    var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,task.options.couchdb.db].join('/')
-    var couch = cdb
-    superagent.post(couch+'/_bulk_docs')
-    .type('json')
-    .send({"docs":docs})
-    .end(function(e,r){
-        superagent.get(couch)
-        .type('json')
-        .end(function(e,r){
-            should.exist(r)
-            r.should.have.property('text')
-            var superagent_sucks = JSON.parse(r.text)
-            superagent_sucks.should.have.property('doc_count',total_docs)
-            return cb()
-        })
-        return null
-    })
-}
+var utils = require('./utils')
 
 before(function(done){
     config_okay('test.config.json',function(err,c){
@@ -117,17 +37,17 @@ before(function(done){
         async.each([options.couchdb.db,options.couchdb.statedb]
                   ,function(db,cb){
                        task.options.couchdb.db=db
-                       create_tempdb(task,cb)
+                       utils.create_tempdb(task,cb)
                        return null
                    }
                   ,function(){
                        task.options.couchdb.db=datadb
                        async.series([function(cb){
-                                           load_hpms(task,cb)
+                                           utils.load_hpms(task,cb)
                                            return null
                                        }
                                       ,function(cb){
-                                           load_detector(task,cb)
+                                           utils.load_detector(task,cb)
                                            return null
                                        }]
                                      ,done)
@@ -166,7 +86,7 @@ describe('get hpms fractions',function(){
             should.not.exist(err)
             should.exist(task)
             task.should.have.property('hpms_fractions')
-            _.keys(task.hpms_fractions).length.should.eql(hpms_docs/2)
+            _.keys(task.hpms_fractions).length.should.eql(utils.hpms_docs)
             task.should.have.property('hpms_fractions_sums')
             task.should.have.property('hpms_fractions_hours')
             return done()
@@ -199,7 +119,7 @@ describe('get hpms fractions',function(){
                 should.not.exist(err)
                 should.exist(task)
                 task.should.have.property('hpms_fractions')
-                _.keys(task.hpms_fractions).length.should.eql(hpms_docs/2)
+                _.keys(task.hpms_fractions).length.should.eql(utils.hpms_docs)
                 task.should.have.property('hpms_fractions_sums')
                 _.each(task.hpms_fractions_sums
                       ,function(v,k){
@@ -224,7 +144,7 @@ describe('get detector fractions',function(){
             should.not.exist(err)
             should.exist(task)
             task.should.have.property('detector_fractions')
-            _.keys(task.detector_fractions).should.have.lengthOf(detector_docs)
+            _.keys(task.detector_fractions).should.have.lengthOf(utils.detector_docs)
             task.should.have.property('detector_fractions_sums')
             task.should.have.property('detector_fractions_hours')
             //console.log(task)
