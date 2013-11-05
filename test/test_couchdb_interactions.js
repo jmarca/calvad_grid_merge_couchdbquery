@@ -21,45 +21,6 @@ var test_db_unique = date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds()
 
 var task,options
 
-function load_hpms(task,cb){
-    var db_dump = require('./test/files/100_223_2008_JAN')
-    var docs = _.map(db_dump.rows
-                    ,function(row){
-                         return row.doc
-                     })
-
-    var db = task.options.couchdb.db
-    var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,db].join('/')
-
-    var couch = 'http://'+cdb
-    superagent.post(couch+'/_bulk_docs')
-    .type('json')
-    .send({"docs":docs})
-    .end(function(e,r){
-        return cb(e)
-    })
-}
-
-function load_detector(task,cb){
-    var db_dump = require('./test/files/189_72_2008_JAN')
-    var docs = _.map(db_dump.rows
-                    ,function(row){
-                         return row.doc
-                     })
-
-    var db = task.options.couchdb.db
-    var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,db].join('/')
-
-    var couch = 'http://'+cdb
-    superagent.post(couch+'/_bulk_docs')
-    .type('json')
-    .send({"docs":docs})
-    .end(function(e,r){
-        return cb(e)
-    })
-}
 
 before(function(done){
     config_okay('test.config.json',function(err,c){
