@@ -21,13 +21,13 @@ var config_okay = require('../lib/config_okay')
 var date = new Date()
 var test_db_unique = date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds()+'-'+date.getMilliseconds()
 
-var task,options
+var task
 
 var utils = require('./utils')
 
 before(function(done){
     config_okay('test.config.json',function(err,c){
-        options ={'couchdb':c.couchdb}
+        var options ={'couchdb':c.couchdb}
         options.couchdb.db += test_db_unique
         options.couchdb.statedb += test_db_unique
 
@@ -57,15 +57,15 @@ before(function(done){
     })
 })
 after(function(done){
-        async.each([options.couchdb.db,options.couchdb.statedb]
+        async.each([task.options.couchdb.db,task.options.couchdb.statedb]
                   ,function(db,cb){
                        var cdb =
                            [task.options.couchdb.url+':'+task.options.couchdb.port
                            ,db].join('/')
                        superagent.del(cdb)
                        .type('json')
-                       .auth(options.couchdb.auth.username
-                            ,options.couchdb.auth.password)
+                       .auth(task.options.couchdb.auth.username
+                            ,task.options.couchdb.auth.password)
                        .end(cb)
                    }
                   ,function(){
