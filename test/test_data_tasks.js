@@ -146,7 +146,7 @@ describe('get detector fractions',function(){
             task.should.have.property('detector_fractions')
             _.keys(task.detector_fractions).should.have.lengthOf(utils.detector_docs)
             task.should.have.property('detector_fractions_sums')
-            task.should.have.property('detector_fractions_hours')
+            task.should.have.property('detector_fractions_hours',utils.detector_docs)
             //console.log(task)
             return done()
         })
