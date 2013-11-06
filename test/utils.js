@@ -16,7 +16,7 @@ function create_tempdb(task,cb){
         cb()
     })
 }
-var total_docs = 0
+
 var hpms_docs=0
 var detector_docs=0
 
@@ -31,13 +31,12 @@ function load_hpms(task,cb){
                                         return row.doc
                                     })
                    var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-                             ,task.options.couchdb.db].join('/')
+                             ,task.options.couchdb.hpms_db].join('/')
                    var couch =  cdb
                    superagent.post(couch+'/_bulk_docs')
                    .type('json')
                    .send({"docs":docs})
                    .end(function(e,r){
-                       total_docs += docs.length
                        hpms_docs += docs.length
                        superagent.get(couch)
                        .type('json')
@@ -46,7 +45,7 @@ function load_hpms(task,cb){
                            r.should.have.property('text')
                            var superagent_sucks = JSON.parse(r.text)
                            superagent_sucks.should.have
-                           .property('doc_count',total_docs)
+                           .property('doc_count',hpms_docs)
                            return innercb()
                        })
                        return null
@@ -64,10 +63,9 @@ function load_detector(task,cb){
                     ,function(row){
                          return row.doc
                      })
-    total_docs += docs.length
     detector_docs = docs.length
     var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,task.options.couchdb.db].join('/')
+              ,task.options.couchdb.detector_db].join('/')
     var couch = cdb
     superagent.post(couch+'/_bulk_docs')
     .type('json')
@@ -79,7 +77,7 @@ function load_detector(task,cb){
             should.exist(r)
             r.should.have.property('text')
             var superagent_sucks = JSON.parse(r.text)
-            superagent_sucks.should.have.property('doc_count',total_docs)
+            superagent_sucks.should.have.property('doc_count',detector_docs)
             return cb()
         })
         return null

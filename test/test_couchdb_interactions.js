@@ -20,39 +20,33 @@ var date = new Date()
 var test_db_unique = date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds()
 
 var task,options
-
+var utils = require('./utils')
 
 before(function(done){
     config_okay('test.config.json',function(err,c){
         options ={'couchdb':c.couchdb}
-        options.couchdb.db += test_db_unique
-        options.couchdb.statedb += test_db_unique
+        options.couchdb.hpms_db += test_db_unique
+        options.couchdb.detector_db += test_db_unique
+        options.couchdb.state_db += test_db_unique
 
         // dummy up a done grid and a not done grid in a test db
         task = {'options':options};
         task.cell_id= '178_92'
         task.year   = 2007
-        async.each([options.couchdb.db,options.couchdb.statedb]
+        async.each([task.options.couchdb.state_db]
                   ,function(db,cb){
-                       var cdb =
-                           [task.options.couchdb.url+':'+task.options.couchdb.port
-                           ,db].join('/')
-                       superagent.put(cdb)
-                       .type('json')
-                       .auth(options.couchdb.auth.username
-                            ,options.couchdb.auth.password)
-                       .end(function(err,result){
-
-                           cb()
-                       })
+                       task.options.couchdb.db=db
+                       utils.create_tempdb(task,cb)
+                       return null
                    }
                   ,done
                   );
         return null
     })
 })
+
 after(function(done){
-        async.each([options.couchdb.db,options.couchdb.statedb]
+        async.each([options.couchdb.state_db]
                   ,function(db,cb){
                        var cdb =
                            [task.options.couchdb.url+':'+task.options.couchdb.port

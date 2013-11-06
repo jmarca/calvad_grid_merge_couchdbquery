@@ -19,7 +19,10 @@ var superagent=require('superagent')
 var config_okay = require('../lib/config_okay')
 
 var date = new Date()
-var test_db_unique = date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds()+'-'+date.getMilliseconds()
+var test_db_unique = date.getHours()+'-'
+                   + date.getMinutes()+'-'
+                   + date.getSeconds()+'-'
+                   + date.getMilliseconds()
 
 var task
 
@@ -28,20 +31,21 @@ var utils = require('./utils')
 before(function(done){
     config_okay('test.config.json',function(err,c){
         var options ={'couchdb':c.couchdb}
-        options.couchdb.db += test_db_unique
-        options.couchdb.statedb += test_db_unique
+        options.couchdb.hpms_db += test_db_unique
+        options.couchdb.detector_db += test_db_unique
+        options.couchdb.state_db += test_db_unique
 
         // dummy up a done grid and a not done grid in a test db
         task = {'options':options};
-        var datadb = options.couchdb.db
-        async.each([options.couchdb.db,options.couchdb.statedb]
+        async.each([task.options.couchdb.detector_db
+                   ,task.options.couchdb.hpms_db
+                   ,task.options.couchdb.state_db]
                   ,function(db,cb){
                        task.options.couchdb.db=db
                        utils.create_tempdb(task,cb)
                        return null
                    }
                   ,function(){
-                       task.options.couchdb.db=datadb
                        async.series([function(cb){
                                            utils.load_hpms(task,cb)
                                            return null
@@ -57,7 +61,9 @@ before(function(done){
     })
 })
 after(function(done){
-        async.each([task.options.couchdb.db,task.options.couchdb.statedb]
+        async.each([task.options.couchdb.detector_db
+                   ,task.options.couchdb.hpms_db
+                   ,task.options.couchdb.state_db]
                   ,function(db,cb){
                        var cdb =
                            [task.options.couchdb.url+':'+task.options.couchdb.port
@@ -79,7 +85,6 @@ after(function(done){
 describe('get hpms fractions',function(){
 
     it('can get data for a known grid',function(done){
-        task.options.couchdb.hpms_fractions_db=task.options.couchdb.db
         task.cell_id='100_223'
         task.year=2008
         get_hpms_fractions(task,function(err,task){
@@ -89,12 +94,14 @@ describe('get hpms fractions',function(){
             _.keys(task.hpms_fractions).length.should.eql(utils.hpms_docs)
             task.should.have.property('hpms_fractions_sums')
             task.should.have.property('hpms_fractions_hours')
+            _.each(task.hpms_fractions,function(record){
+                record.should.have.keys('n','hh','nhh')
+            })
             return done()
         })
     })
 
     it('will not crash if an unkown grid is passed in',function(done){
-        task.options.couchdb.hpms_fractions_db=task.options.couchdb.db
         task.cell_id='101_223'
         task.year=2008
         get_hpms_fractions(task,function(err,task){
@@ -105,7 +112,6 @@ describe('get hpms fractions',function(){
     })
 
     it('will merge multiple grid cells by time',function(done){
-        task.options.couchdb.hpms_fractions_db=task.options.couchdb.db
         task.cell_id='100_223'
         task.year=2008
         get_hpms_fractions(task,function(err,task){
@@ -137,7 +143,6 @@ describe('get hpms fractions',function(){
 describe('get detector fractions',function(){
 
     it('can get data for a known grid',function(done){
-        task.options.couchdb.detector_data_db=task.options.couchdb.db
         task.cell_id='189_72'
         task.year=2008
         get_detector_fractions(task,function(err,task){
@@ -153,7 +158,6 @@ describe('get detector fractions',function(){
     })
 
     it('will not crash if an unkown grid is passed in',function(done){
-        task.options.couchdb.detector_fractions_db=task.options.couchdb.db
         task.cell_id='101_223'
         task.year=2008
         get_detector_fractions(task,function(err,task){
@@ -164,7 +168,6 @@ describe('get detector fractions',function(){
     })
 
     it('will merge multiple grid cells by time',function(done){
-        task.options.couchdb.detector_fractions_db=task.options.couchdb.db
         task.cell_id='189_72'
         task.year=2008
         get_detector_fractions(task,function(err,task){
