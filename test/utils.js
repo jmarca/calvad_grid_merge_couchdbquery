@@ -84,8 +84,65 @@ function load_detector(task,cb){
     })
 }
 
+
+function demo_db_before(config){
+    return function(done){
+        var task = {options:config}
+        // dummy up a done grid and a not done grid in a test db
+
+        async.each([task.options.couchdb.detector_db
+                   ,task.options.couchdb.hpms_db
+                   ,task.options.couchdb.state_db]
+                  ,function(db,cb){
+                       task.options.couchdb.db=db
+                       create_tempdb(task,cb)
+                       return null
+                   }
+                  ,function(){
+                       async.series([function(cb){
+                                           load_hpms(task,cb)
+                                           return null
+                                       }
+                                      ,function(cb){
+                                           load_detector(task,cb)
+                                           return null
+                                       }]
+                                     ,done)
+                   }
+                  );
+        return null
+    }
+
+}
+function demo_db_after(config){
+    return  function(done){
+        var task = {options:config}
+        async.each([task.options.couchdb.detector_db
+                   ,task.options.couchdb.hpms_db
+                   ,task.options.couchdb.state_db]
+                  ,function(db,cb){
+                       var cdb =
+                           [task.options.couchdb.url+':'+task.options.couchdb.port
+                           ,db].join('/')
+                       superagent.del(cdb)
+                       .type('json')
+                       .auth(task.options.couchdb.auth.username
+                            ,task.options.couchdb.auth.password)
+                       .end(cb)
+                   }
+                  ,function(){
+                       done()
+                   });
+        return null
+
+    }
+}
+
+
 exports.load_detector = load_detector
 exports.load_hpms     = load_hpms
 exports.create_tempdb = create_tempdb
 exports.hpms_docs     = 744 // 24 hours, 31 days
 exports.detector_docs = 744
+exports.demo_db_after = demo_db_after
+exports.demo_db_before= demo_db_before
