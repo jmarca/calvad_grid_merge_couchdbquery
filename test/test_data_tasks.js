@@ -1,4 +1,4 @@
-* global require console process it describe after before */
+/* global require console process it describe after before */
 
 var should = require('should')
 
@@ -186,8 +186,14 @@ describe('get detector fractions',function(){
                       ,function(v,k){
                            v.should.be.above(sums[k])
                            return null
-                       })
-                    task.should.have.property('detector_fractions_hours',hours)
+                       });
+                task.should.have.property('detector_fractions_hours',hours)
+                task.should.have.property('detector_data')
+                _.size(task.detector_data).should.be.eql(utils.detector_docs)
+                _.each(task.detector_data,function(record,ts){
+                    record.should.be.instanceOf(Array)
+                    record.length.should.be.above(16)
+                })
                 return done()
             })
         })
