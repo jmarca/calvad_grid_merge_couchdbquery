@@ -1,4 +1,4 @@
-/* global require console process it describe after before */
+* global require console process it describe after before */
 
 var should = require('should')
 
