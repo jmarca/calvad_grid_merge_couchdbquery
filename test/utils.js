@@ -89,11 +89,14 @@ function demo_db_before(config){
     return function(done){
         var task = {options:config}
         // dummy up a done grid and a not done grid in a test db
+        var dbs = [task.options.couchdb.detector_db
+                  ,task.options.couchdb.hpms_db
+                  ,task.options.couchdb.state_db
+                  ,task.options.couchdb.calvad_db]
 
-        async.each([task.options.couchdb.detector_db
-                   ,task.options.couchdb.hpms_db
-                   ,task.options.couchdb.state_db]
+        async.each(dbs
                   ,function(db,cb){
+                       if(!db) return cb()
                        task.options.couchdb.db=db
                        create_tempdb(task,cb)
                        return null
@@ -117,10 +120,14 @@ function demo_db_before(config){
 function demo_db_after(config){
     return  function(done){
         var task = {options:config}
-        async.each([task.options.couchdb.detector_db
-                   ,task.options.couchdb.hpms_db
-                   ,task.options.couchdb.state_db]
+        var dbs = [task.options.couchdb.detector_db
+                  ,task.options.couchdb.hpms_db
+                  ,task.options.couchdb.state_db
+                  ,task.options.couchdb.calvad_db]
+
+        async.each(dbs
                   ,function(db,cb){
+                       if(!db) return cb()
                        var cdb =
                            [task.options.couchdb.url+':'+task.options.couchdb.port
                            ,db].join('/')
