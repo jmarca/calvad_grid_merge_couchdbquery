@@ -33,6 +33,7 @@ function load_hpms(task,cb){
                    var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
                              ,task.options.couchdb.hpms_db].join('/')
                    var couch =  cdb
+                   console.log(couch)
                    superagent.post(couch+'/_bulk_docs')
                    .type('json')
                    .send({"docs":docs})
@@ -136,6 +137,7 @@ function demo_db_after(config){
                        .auth(task.options.couchdb.auth.username
                             ,task.options.couchdb.auth.password)
                        .end(cb)
+                       return null
                    }
                   ,function(){
                        done()
