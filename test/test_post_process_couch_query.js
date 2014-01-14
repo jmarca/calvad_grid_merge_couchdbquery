@@ -27,45 +27,58 @@ var should = require('should')
 var async = require('async')
 var _ = require('lodash')
 var config={}
-// before(function(done){
-//     config_okay('test.config.json',function(err,c){
-//         config.postgres=_.clone(c.postgres,true)
-//         config.couchdb =_.clone(c.couchdb,true)
-//         var date = new Date()
-//         var test_db_unique = date.getHours()+'-'
-//                            + date.getMinutes()+'-'
-//                            + date.getSeconds()+'-'
-//                            + date.getMilliseconds()
-
-//         config.couchdb.hpms_db += test_db_unique
-//         config.couchdb.detector_db += test_db_unique
-//         config.couchdb.state_db += test_db_unique
-//         return done()
-//     })
-//     return null
-// })
-
 var utils = require('./utils')
+var superagent = require('superagent')
+var date = new Date()
+var test_db_unique = date.getHours()+'-'
+                   + date.getMinutes()+'-'
+                   + date.getSeconds()+'-'
+                   + date.getMilliseconds()
+
+var task
+
+before(function(done){
+    config_okay('test.config.json',function(err,c){
+        config.postgres=_.clone(c.postgres,true)
+        config.couchdb =_.clone(c.couchdb,true)
+        var date = new Date()
+        var test_db_unique = date.getHours()+'-'
+                           + date.getMinutes()+'-'
+                           + date.getSeconds()+'-'
+                           + date.getMilliseconds()
+
+        config.couchdb.hpms_db += test_db_unique
+        config.couchdb.detector_db += test_db_unique
+        config.couchdb.state_db += test_db_unique
+        return done()
+    })
+    return null
+})
 
 describe('post_process_couch_query',function(){
-    //    before(utils.demo_db_before(config))
-    //    after(utils.demo_db_after(config))
+    var task ={'options':config
+              ,'cell_id':'100_223'
+              ,'year':2008
+              }
+    before(function(done){
+        async.series([utils.demo_db_before(config)
+                     ,function(cb){
+                          get_hpms_fractions(task,cb)
+                      }]
+                    ,done)
+        return null
+    })
+    after(utils.demo_db_after(config))
+
     it('should correctly post process a fake couch result',function(done){
-        var tasks = [{'options':config
-                     ,'cell_id':'100_223'
-                     ,'year':2008
-                     }
-                    ,{'options':config
-                     ,'cell_id':'189_72'
-                     ,'year':2008
-                     }
-                    ]
-        reduce.post_process_couch_query(tasks[0]
+        task.should.not.have.property('scale')
+        reduce.post_process_couch_query(task
                                        ,function(e,t){
                                             should.not.exist(e)
                                             should.exist(t)
-                                            t.should.have.property('accum')
-
+                                            t.should.have.property('scale')
+                                            console.log(t)
+                                            return done()
                                         })
     })
 })
