@@ -55,30 +55,62 @@ before(function(done){
     return null
 })
 
-describe('post_process_couch_query',function(){
-    var task ={'options':config
-              ,'cell_id':'100_223'
-              ,'year':2008
-              }
-    before(function(done){
-        async.series([utils.demo_db_before(config)
-                     ,function(cb){
-                          get_hpms_fractions(task,cb)
-                      }]
-                    ,done)
-        return null
-    })
+describe('post_process_hpms_couch_query',function(){
+    before(utils.demo_db_before(config))
     after(utils.demo_db_after(config))
 
-    it('should correctly post process a fake couch result',function(done){
+    it('should correctly post process a couch hpms result',function(done){
+        var task ={'options':config
+                  ,'cell_id':'100_223'
+                  ,'year':2008
+                  }
         task.should.not.have.property('scale')
-        reduce.post_process_couch_query(task
-                                       ,function(e,t){
-                                            should.not.exist(e)
-                                            should.exist(t)
-                                            t.should.have.property('scale')
-                                            console.log(t)
-                                            return done()
-                                        })
+        async.waterfall([
+                     function(cb){
+                         return get_hpms_fractions(task,cb)
+                      }
+                   ,function(t,cb){
+                        return reduce.post_process_couch_query(t,cb)
+                    }]
+                    ,function(e,t){
+                         should.not.exist(e)
+                         should.exist(t)
+                         t.should.have.property('scale')
+                         t.scale.n.should.be
+                         .approximately(1.0164381992, 0.00001)
+                         t.scale.hh.should.be
+                         .approximately(0.9912986681, 0.00001)
+                         t.scale.nhh.should.be
+                         .approximately(1.0068673223, 0.00001)
+                         return done()
+                     });
+
+    })
+    it('should correctly post process a couch detector result',function(done){
+        var task ={'options':config
+                  ,'cell_id':'189_72'
+                  ,'year':2008
+                  }
+        task.should.not.have.property('scale')
+        async.waterfall([
+                     function(cb){
+                         return get_detector_fractions(task,cb)
+                      }
+                   ,function(t,cb){
+                        return reduce.post_process_couch_query(t,cb)
+                    }]
+                    ,function(e,t){
+                         should.not.exist(e)
+                         should.exist(t)
+                         t.should.have.property('scale')
+                         t.scale.n.should.be
+                         .approximately(1.0, 0.00001)
+                         t.scale.hh.should.be
+                         .approximately(1.0, 0.00001)
+                         t.scale.nhh.should.be
+                         .approximately(1.0, 0.00001)
+                         return done()
+                     });
+
     })
 })
