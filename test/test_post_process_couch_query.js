@@ -9,7 +9,10 @@
 
 // use the known months in test/files/*.json
 
-// dump using the "to_csv" code I have in the modified formatter.js, then use a spreadsheet to figure out what the results *should* be.  Then run the code on those same months and see if it works out properly.
+// dump using the "to_csv" code I have in the modified formatter.js,
+// then use a spreadsheet to figure out what the results *should* be.
+// Then run the code on those same months and see if it works out
+// properly.
 
 
 var cdb_interactions = require('../lib/couchdb_interactions')
