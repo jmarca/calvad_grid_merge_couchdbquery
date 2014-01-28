@@ -59,7 +59,9 @@ function load_hpms(task,cb){
 }
 
 function load_detector(task,cb){
-    var db_dump = require('./files/189_72_2008_JAN.json')
+    var db_dump = require('./files/132_164_2008_JAN.json'
+                         ,'./files/132_164_2009_JAN.json'
+                         ,'./files/189_72_2008_JAN.json')
     var docs = _.map(db_dump.rows
                     ,function(row){
                          return row.doc
