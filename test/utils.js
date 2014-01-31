@@ -21,9 +21,11 @@ var hpms_docs=0
 var detector_docs=0
 
 function load_hpms(task,cb){
-    async.eachSeries(['./files/100_223_2008_JAN.json'
-               ,'./files/178_97_2008_JAN.json']
-              ,function(file,innercb){
+    var db_files = ['./files/100_223_2008_JAN.json'
+                   ,'./files/178_97_2008_JAN.json'
+                   ,'./files/134_163_2008_JAN.json']
+    async.eachSeries(db_files
+               ,function(file,innercb){
 
                    var db_dump = require(file)
                    var docs = _.map(db_dump.rows
@@ -58,7 +60,8 @@ function load_hpms(task,cb){
 function load_detector(task,cb){
     var db_files = ['./files/132_164_2008_JAN.json'
                    ,'./files/132_164_2009_JAN.json'
-                   ,'./files/189_72_2008_JAN.json']
+                   ,'./files/189_72_2008_JAN.json'
+                   ,'./files/134_163_2008_JAN_detector.json']
     async.eachSeries(db_files
               ,function(file,innercb){
 
