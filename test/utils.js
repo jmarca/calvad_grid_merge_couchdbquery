@@ -21,9 +21,11 @@ var hpms_docs=0
 var detector_docs=0
 
 function load_hpms(task,cb){
-    async.each(['./files/100_223_2008_JAN.json'
-               ,'./files/178_97_2008_JAN.json']
-              ,function(file,innercb){
+    var db_files = ['./files/100_223_2008_JAN.json'
+                   ,'./files/178_97_2008_JAN.json'
+                   ,'./files/134_163_2008_JAN.json']
+    async.eachSeries(db_files
+               ,function(file,innercb){
 
                    var db_dump = require(file)
                    var docs = _.map(db_dump.rows
@@ -51,37 +53,47 @@ function load_hpms(task,cb){
                        return null
                    })
                }
-              ,function(e){
-                   return cb(e)
-               })
-        return null
+              ,cb);
+    return null
 }
 
 function load_detector(task,cb){
-    var db_dump = require('./files/189_72_2008_JAN.json')
-    var docs = _.map(db_dump.rows
-                    ,function(row){
-                         return row.doc
-                     })
-    detector_docs = docs.length
-    var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,task.options.couchdb.detector_db].join('/')
-    var couch = cdb
-    superagent.post(couch+'/_bulk_docs')
-    .type('json')
-    .send({"docs":docs})
-    .end(function(e,r){
-        superagent.get(couch)
-        .type('json')
-        .end(function(e,r){
-            should.exist(r)
-            r.should.have.property('text')
-            var superagent_sucks = JSON.parse(r.text)
-            superagent_sucks.should.have.property('doc_count',detector_docs)
-            return cb()
-        })
-        return null
-    })
+    var db_files = ['./files/132_164_2008_JAN.json'
+                   ,'./files/132_164_2009_JAN.json'
+                   ,'./files/189_72_2008_JAN.json'
+                   ,'./files/134_163_2008_JAN_detector.json']
+    async.eachSeries(db_files
+              ,function(file,innercb){
+
+                   var db_dump = require(file)
+                   var docs = _.map(db_dump.rows
+                                   ,function(row){
+                                        return row.doc
+                                    })
+                   var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
+                             ,task.options.couchdb.detector_db].join('/')
+                   var couch = cdb
+                   superagent.post(couch+'/_bulk_docs')
+                   .type('json')
+                   .send({"docs":docs})
+                   .end(function(e,r){
+                       detector_docs += docs.length
+                       superagent.get(couch)
+                       .type('json')
+                       .end(function(e,r){
+                           should.exist(r)
+                           r.should.have.property('text')
+                           var superagent_sucks = JSON.parse(r.text)
+                           superagent_sucks.should.have
+                           .property('doc_count',detector_docs)
+                           return innercb()
+                       })
+                   })
+                   return null
+               }
+              ,cb);
+    return null
+
 }
 
 
@@ -136,6 +148,7 @@ function demo_db_after(config){
                        .auth(task.options.couchdb.auth.username
                             ,task.options.couchdb.auth.password)
                        .end(cb)
+                       return null
                    }
                   ,function(){
                        done()

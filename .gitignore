@@ -1,3 +1,6 @@
-/#package.json#
 /test.config.json
 /config.json
+\#*
+.#*
+.~*
+*~
