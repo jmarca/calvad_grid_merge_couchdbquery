@@ -21,12 +21,15 @@
   "dependencies": {
     "calvad_areas": "git://github.com/jmarca/calvad_areas.git",
     "calvad_compute_aadt": "git://github.com/jmarca/calvad_compute_aadt.git",
-    "couchdb_bulkdoc_saver": "git://github.com/jmarca/couchdb_bulkdoc_saver.git",
+    "config_okay": "0.0.2",
     "couch_check_state": "git://github.com/jmarca/couch_check_state.git",
     "couch_set_state": "git://github.com/jmarca/couch_set_state.git",
+    "couchdb_bulkdoc_saver": "git://github.com/jmarca/couchdb_bulkdoc_saver.git",
     "couchdb_get_views": "git://github.com/jmarca/couchdb_get_views.git",
     "couchdb_put_doc": "git://github.com/jmarca/couchdb_put_doc.git",
     "lodash": "",
-    "pg": "~2.8.2"
+    "pg": "~2.8.2",
+    "queue-async": "^1.0.7",
+    "should": "^4.3.0"
   }
 }
