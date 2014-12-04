@@ -60,7 +60,7 @@ function post_file(file,couch,doclen,cb){
     .end(function(e,r){
         should.not.exist(e)
         should.exist(r)
-        return cb()
+        return cb(null,doclen)
     })
     return null
 }
@@ -76,16 +76,16 @@ function load_hpms(task,cb){
     db_files.forEach(function(db){
         q.defer(post_file,db,cdb,hpms_docs)
     })
-    q.await(function(err){
-        err.should.not.exist()
-        superagent.get(couch)
+    q.await(function(err,d1,d2,d3){
+        should.not.exist(err)
+        superagent.get(cdb)
         .type('json')
         .end(function(e,r){
-            e.should.not.exist()
+            should.not.exist(e)
             should.exist(r)
             r.should.have.property('text')
             var superagent_sucks = JSON.parse(r.text)
-            superagent_sucks.should.have.property('doc_count',hpms_docs)
+            superagent_sucks.should.have.property('doc_count',d1+d2+d3)
             return cb()
 
         })
@@ -106,16 +106,16 @@ function load_detector(task,cb){
     db_files.forEach(function(db){
         q.defer(post_file,db,cdb,detector_docs)
     })
-    q.await(function(err){
-        err.should.not.exist()
-        superagent.get(couch)
+    q.await(function(err,d1,d2,d3,d4){
+        should.not.exist(err)
+        superagent.get(cdb)
         .type('json')
         .end(function(e,r){
-            e.should.not.exist()
+            should.not.exist(e)
             should.exist(r)
             r.should.have.property('text')
             var superagent_sucks = JSON.parse(r.text)
-            superagent_sucks.should.have.property('doc_count',detector_docs)
+            superagent_sucks.should.have.property('doc_count',d1+d2+d3+d4)
             return cb()
         })
         return null

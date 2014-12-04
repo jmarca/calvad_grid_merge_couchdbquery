@@ -2,7 +2,7 @@
 
 var should = require('should')
 
-var async = require('async')
+var queue = require('queue-async')
 var _ = require('lodash')
 
 var cdb_interactions = require('../lib/couchdb_interactions')
@@ -12,11 +12,10 @@ var in_process = cdb_interactions.mark_in_process
 var get_hpms_fractions = cdb_interactions.get_hpms_fractions
 var get_detector_fractions = cdb_interactions.get_detector_fractions
 
-var get_detector_routes = require('../lib/query_postgres').get_detector_route_nums
 var fs = require('fs')
 var superagent=require('superagent')
 
-var config_okay = require('../lib/config_okay')
+var config_okay = require('config_okay')
 
 var date = new Date()
 var test_db_unique = date.getHours()+'-'
@@ -27,58 +26,26 @@ var test_db_unique = date.getHours()+'-'
 var task
 
 var utils = require('./utils')
-
+var path = require('path')
+var rootdir = path.normalize(__dirname)
+var config_file = rootdir+'/../test.config.json'
+var options
 before(function(done){
-    config_okay('test.config.json',function(err,c){
-        var options ={'couchdb':c.couchdb}
+    config_okay(config_file,function(err,c){
+        options ={'couchdb':c.couchdb}
         options.couchdb.hpms_db += test_db_unique
         options.couchdb.detector_db += test_db_unique
         options.couchdb.state_db += test_db_unique
 
         // dummy up a done grid and a not done grid in a test db
         task = {'options':options};
-        async.each([task.options.couchdb.detector_db
-                   ,task.options.couchdb.hpms_db
-                   ,task.options.couchdb.state_db]
-                  ,function(db,cb){
-                       task.options.couchdb.db=db
-                       utils.create_tempdb(task,cb)
-                       return null
-                   }
-                  ,function(){
-                       async.series([function(cb){
-                                           utils.load_hpms(task,cb)
-                                           return null
-                                       }
-                                      ,function(cb){
-                                           utils.load_detector(task,cb)
-                                           return null
-                                       }]
-                                     ,done)
-                   }
-                  );
+        utils.demo_db_before(options)(done)
         return null
     })
 })
 after(function(done){
-        async.each([task.options.couchdb.detector_db
-                   ,task.options.couchdb.hpms_db
-                   ,task.options.couchdb.state_db]
-                  ,function(db,cb){
-                       var cdb =
-                           [task.options.couchdb.url+':'+task.options.couchdb.port
-                           ,db].join('/')
-                       superagent.del(cdb)
-                       .type('json')
-                       .auth(task.options.couchdb.auth.username
-                            ,task.options.couchdb.auth.password)
-                       .end(cb)
-                   }
-                  ,function(){
-                       done()
-                   });
+    utils.demo_db_after(options)(done)
     return null
-
 })
 
 
