@@ -19,18 +19,21 @@ var cdb_interactions = require('../lib/couchdb_interactions')
 var get_hpms_fractions = cdb_interactions.get_hpms_fractions
 var flatten_records = require('../lib/flatten').flatten_records
 var reduce = require('../lib/reduce')
-var config_okay = require('../lib/config_okay')
-var queries = require('../lib/query_postgres')
-var get_hpms_aadt = queries.get_hpms_from_sql
+var config_okay = require('config_okay')
+
 var get_detector_fractions = cdb_interactions.get_detector_fractions
-var get_detector_routes = queries.get_detector_route_nums
+
 
 var should = require('should')
 
-var async = require('async')
+var queue = require('queue-async')
 var _ = require('lodash')
 var config={}
 var utils = require('./utils')
+var path = require('path')
+var rootdir = path.normalize(__dirname)
+var config_file = rootdir+'/../test.config.json'
+
 var superagent = require('superagent')
 var date = new Date()
 var test_db_unique = date.getHours()+'-'
@@ -41,8 +44,7 @@ var test_db_unique = date.getHours()+'-'
 var task
 
 before(function(done){
-    config_okay('test.config.json',function(err,c){
-        config.postgres=_.clone(c.postgres,true)
+    config_okay(config_file,function(err,c){
         config.couchdb =_.clone(c.couchdb,true)
         var date = new Date()
         var test_db_unique = date.getHours()+'-'
@@ -53,14 +55,16 @@ before(function(done){
         config.couchdb.hpms_db += test_db_unique
         config.couchdb.detector_db += test_db_unique
         config.couchdb.state_db += test_db_unique
-        return done()
+        // dummy up a done grid and a not done grid in a test db
+        task = {'options':config};
+        utils.demo_db_before(config)(done)
+    return null
     })
     return null
 })
+after(utils.demo_db_after(config))
 
 describe('post_process_hpms_couch_query',function(){
-    before(utils.demo_db_before(config))
-    after(utils.demo_db_after(config))
 
     it('should correctly post process a couch hpms result',function(done){
         var task ={'options':config
@@ -68,22 +72,18 @@ describe('post_process_hpms_couch_query',function(){
                   ,'year':2008
                   }
         task.should.not.have.property('scale')
-        async.waterfall([
-                     function(cb){
-                         return get_hpms_fractions(task,cb)
-                      }
-                   ,function(t,cb){
-                        return reduce.post_process_couch_query(t,cb)
-                    }]
-                    ,function(e,t){
+        queue(1)
+        .defer(get_hpms_fractions,task)
+        .defer(reduce.post_process_couch_query,task)
+        .await(function(e){
                          should.not.exist(e)
-                         should.exist(t)
-                         t.should.have.property('scale')
-                         t.scale.n.should.be
+                         should.exist(task)
+                         task.should.have.property('scale')
+                         task.scale.n.should.be
                          .approximately(1.0164381992, 0.00001)
-                         t.scale.hh.should.be
+                         task.scale.hh.should.be
                          .approximately(0.9912986681, 0.00001)
-                         t.scale.nhh.should.be
+                         task.scale.nhh.should.be
                          .approximately(1.0068673223, 0.00001)
                          return done()
                      });
@@ -95,22 +95,18 @@ describe('post_process_hpms_couch_query',function(){
                   ,'year':2008
                   }
         task.should.not.have.property('scale')
-        async.waterfall([
-                     function(cb){
-                         return get_detector_fractions(task,cb)
-                      }
-                   ,function(t,cb){
-                        return reduce.post_process_couch_query(t,cb)
-                    }]
-                    ,function(e,t){
+        queue(1)
+        .defer(get_detector_fractions,task)
+        .defer(reduce.post_process_couch_query,task)
+        .await(function(e){
                          should.not.exist(e)
-                         should.exist(t)
-                         t.should.have.property('scale')
-                         t.scale.n.should.be
+                         should.exist(task)
+                         task.should.have.property('scale')
+                         task.scale.n.should.be
                          .approximately(1.0, 0.00001)
-                         t.scale.hh.should.be
+                         task.scale.hh.should.be
                          .approximately(1.0, 0.00001)
-                         t.scale.nhh.should.be
+                         task.scale.nhh.should.be
                          .approximately(1.0, 0.00001)
                          return done()
                      });
