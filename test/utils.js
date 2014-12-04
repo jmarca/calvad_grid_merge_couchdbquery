@@ -1,7 +1,7 @@
 /*global require exports */
 var superagent = require('superagent')
 
-var queue=require('async-queue')
+var queue=require('queue-async')
 
 var _ = require('lodash')
 var should = require('should')
@@ -175,6 +175,7 @@ function demo_db_after(config){
 exports.load_detector = load_detector
 exports.load_hpms     = load_hpms
 exports.create_tempdb = create_tempdb
+exports.delete_tempdb = delete_tempdb
 exports.hpms_docs     = 744 // 24 hours, 31 days
 exports.detector_docs = 744
 exports.demo_db_after = demo_db_after

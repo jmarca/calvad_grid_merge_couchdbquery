@@ -16,7 +16,8 @@
     "url": "https://github.com/jmarca/calvad_grid_merge/issues"
   },
   "devDependencies": {
-    "should": "~2.0.2"
+    "should": "~2.0.2",
+    "superagent": "^0.21.0"
   },
   "dependencies": {
     "calvad_areas": "git://github.com/jmarca/calvad_areas.git",
