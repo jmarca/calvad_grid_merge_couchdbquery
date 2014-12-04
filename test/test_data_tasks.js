@@ -42,6 +42,7 @@ before(function(done){
         utils.demo_db_before(options)(done)
         return null
     })
+    return null
 })
 after(function(done){
     utils.demo_db_after(options)(done)
