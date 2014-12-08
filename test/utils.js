@@ -100,7 +100,7 @@ function load_detector(task,cb){
                    ,'./files/189_72_2008_JAN.json'
                    ,'./files/134_163_2008_JAN_detector.json']
     var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,task.options.couchdb.detector_db].join('/')
+              ,task.options.couchdb.grid_merge_couchdbquery_db].join('/')
 
     var q = queue()
     db_files.forEach(function(db){
@@ -128,7 +128,7 @@ function demo_db_before(config){
     return function(done){
         var task = {options:config}
         // dummy up a done grid and a not done grid in a test db
-        var dbs = [task.options.couchdb.detector_db
+        var dbs = [task.options.couchdb.grid_merge_couchdbquery_db
                   ,task.options.couchdb.hpms_db
                   ,task.options.couchdb.state_db
                   ,task.options.couchdb.calvad_db]
@@ -154,7 +154,7 @@ function demo_db_before(config){
 function demo_db_after(config){
     return  function(done){
         var task = {options:config}
-        var dbs = [task.options.couchdb.detector_db
+        var dbs = [task.options.couchdb.grid_merge_couchdbquery_db
                   ,task.options.couchdb.hpms_db
                   ,task.options.couchdb.state_db
                   ,task.options.couchdb.calvad_db]

@@ -53,7 +53,7 @@ before(function(done){
                            + date.getMilliseconds()
 
         config.couchdb.hpms_db += test_db_unique
-        config.couchdb.detector_db += test_db_unique
+        config.couchdb.grid_merge_couchdbquery_db += test_db_unique
         config.couchdb.state_db += test_db_unique
         // dummy up a done grid and a not done grid in a test db
         task = {'options':config};

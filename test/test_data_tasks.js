@@ -34,7 +34,7 @@ before(function(done){
     config_okay(config_file,function(err,c){
         options ={'couchdb':c.couchdb}
         options.couchdb.hpms_db += test_db_unique
-        options.couchdb.detector_db += test_db_unique
+        options.couchdb.grid_merge_couchdbquery_db += test_db_unique
         options.couchdb.state_db += test_db_unique
 
         // dummy up a done grid and a not done grid in a test db
