@@ -49,9 +49,8 @@ after(function(done){
 
 describe('get hpms fractions',function(){
 
-    var task = {'options':options};
-
     it('can get data for a known grid',function(done){
+        var task = {'options':_.clone(options,true)}
         task.cell_id='100_223'
         task.year=2008
         get_hpms_fractions(task,function(err,task){
@@ -69,6 +68,7 @@ describe('get hpms fractions',function(){
     })
 
     it('will not crash if an unkown grid is passed in',function(done){
+        var task = {'options':_.clone(options,true)}
         task.cell_id='101_223'
         task.year=2008
         get_hpms_fractions(task,function(err,task){
@@ -78,7 +78,21 @@ describe('get hpms fractions',function(){
         })
     })
 
+    it('will not crash if the task has an extraneous view parameter',
+       function(done){
+        var task = {'options':_.clone(options,true)}
+        task.cell_id='101_223'
+        task.year=2008
+           task.options.couchdb.view='someview'
+        get_hpms_fractions(task,function(err,task){
+            should.not.exist(err)
+            should.exist(task)
+            return done()
+        })
+    })
+
     it('will merge multiple grid cells by time',function(done){
+        var task = {'options':_.clone(options,true)}
         task.cell_id='100_223'
         task.year=2008
         get_hpms_fractions(task,function(err,task){
@@ -109,9 +123,25 @@ describe('get hpms fractions',function(){
 
 describe('get detector fractions',function(){
 
-    var task = {'options':options};
-
     it('can get data for a known grid',function(done){
+        var task = {'options':_.clone(options,true)}
+        task.cell_id='189_72'
+        task.year=2008
+        get_detector_fractions(task,function(err,task){
+            should.not.exist(err)
+            should.exist(task)
+            task.should.have.property('detector_fractions')
+            _.keys(task.detector_fractions).should.have.lengthOf(utils.detector_docs)
+            task.should.have.property('detector_fractions_sums')
+            task.should.have.property('detector_fractions_hours',utils.detector_docs)
+            //console.log(task)
+            return done()
+        })
+    })
+
+    it('should not crash on an extraneous view param',function(done){
+        var task = {'options':_.clone(options,true)}
+        task.options.couchdb.view='crashme'
         task.cell_id='189_72'
         task.year=2008
         get_detector_fractions(task,function(err,task){
@@ -127,6 +157,7 @@ describe('get detector fractions',function(){
     })
 
     it('will not crash if an unkown grid is passed in',function(done){
+        var task = {'options':_.clone(options,true)}
         task.cell_id='101_223'
         task.year=2008
         get_detector_fractions(task,function(err,task){
@@ -137,6 +168,7 @@ describe('get detector fractions',function(){
     })
 
     it('will merge multiple grid cells by time',function(done){
+        var task = {'options':_.clone(options,true)}
         task.cell_id='189_72'
         task.year=2008
         get_detector_fractions(task,function(err,task){
