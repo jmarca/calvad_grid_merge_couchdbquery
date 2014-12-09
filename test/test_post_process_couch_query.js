@@ -28,7 +28,6 @@ var should = require('should')
 
 var queue = require('queue-async')
 var _ = require('lodash')
-var config={}
 var utils = require('./utils')
 var path = require('path')
 var rootdir = path.normalize(__dirname)
@@ -41,33 +40,31 @@ var test_db_unique = date.getHours()+'-'
                    + date.getSeconds()+'-'
                    + date.getMilliseconds()
 
-var task
+var options = {}
+var date = new Date()
+var test_db_unique = date.getHours()+'-'
+                   + date.getMinutes()+'-'
+                   + date.getSeconds()+'-'
+                   + date.getMilliseconds()
 
 before(function(done){
     config_okay(config_file,function(err,c){
-        config.couchdb =_.clone(c.couchdb,true)
-        var date = new Date()
-        var test_db_unique = date.getHours()+'-'
-                           + date.getMinutes()+'-'
-                           + date.getSeconds()+'-'
-                           + date.getMilliseconds()
+        options.couchdb=c.couchdb
+        options.couchdb.grid_merge_couchdbquery_hpms_db += test_db_unique
+        options.couchdb.grid_merge_couchdbquery_detector_db += test_db_unique
+        options.couchdb.grid_merge_couchdbquery_state_db += test_db_unique
 
-        config.couchdb.hpms_db += test_db_unique
-        config.couchdb.grid_merge_couchdbquery_db += test_db_unique
-        config.couchdb.state_db += test_db_unique
-        // dummy up a done grid and a not done grid in a test db
-        task = {'options':config};
-        utils.demo_db_before(config)(done)
-    return null
+        utils.demo_db_before(options)(done)
+        return null
     })
     return null
 })
-after(utils.demo_db_after(config))
+after(utils.demo_db_after(options))
 
 describe('post_process_hpms_couch_query',function(){
 
     it('should correctly post process a couch hpms result',function(done){
-        var task ={'options':config
+        var task ={'options':options
                   ,'cell_id':'100_223'
                   ,'year':2008
                   }
@@ -90,7 +87,7 @@ describe('post_process_hpms_couch_query',function(){
 
     })
     it('should correctly post process a couch detector result',function(done){
-        var task ={'options':config
+        var task ={'options':options
                   ,'cell_id':'189_72'
                   ,'year':2008
                   }
