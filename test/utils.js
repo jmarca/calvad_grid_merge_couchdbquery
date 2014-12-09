@@ -9,10 +9,10 @@ var should = require('should')
 function create_tempdb(task,db,cb){
     if(typeof db === 'function'){
         cb = db
-        db = task.options.couchdb.db
+        db = task.options.couchdb.grid_merge_couchdbquery_detector_db
     }
     var cdb =
-        [task.options.couchdb.url+':'+task.options.couchdb.port
+        [task.options.couchdb.host+':'+task.options.couchdb.port
         ,db].join('/')
     superagent.put(cdb)
     .type('json')
@@ -27,10 +27,10 @@ function create_tempdb(task,db,cb){
 function delete_tempdb(task,db,cb){
     if(typeof db === 'function'){
         cb = db
-        db = task.options.couchdb.db
+        db = task.options.couchdb.grid_merge_couchdbquery_detector_db
     }
     var cdb =
-        [task.options.couchdb.url+':'+task.options.couchdb.port
+        [task.options.couchdb.host+':'+task.options.couchdb.port
         ,db].join('/')
     superagent.del(cdb)
     .type('json')
@@ -69,12 +69,12 @@ function load_hpms(task,cb){
     var db_files = ['./files/100_223_2008_JAN.json'
                    ,'./files/178_97_2008_JAN.json'
                    ,'./files/134_163_2008_JAN.json']
-    var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,task.options.couchdb.hpms_db].join('/')
+    var cdb = [task.options.couchdb.host+':'+task.options.couchdb.port
+              ,task.options.couchdb.grid_merge_couchdbquery_hpms_db].join('/')
 
     var q = queue()
-    db_files.forEach(function(db){
-        q.defer(post_file,db,cdb,hpms_docs)
+    db_files.forEach(function(file){
+        q.defer(post_file,file,cdb,hpms_docs)
     })
     q.await(function(err,d1,d2,d3){
         should.not.exist(err)
@@ -99,12 +99,11 @@ function load_detector(task,cb){
                    ,'./files/132_164_2009_JAN.json'
                    ,'./files/189_72_2008_JAN.json'
                    ,'./files/134_163_2008_JAN_detector.json']
-    var cdb = [task.options.couchdb.url+':'+task.options.couchdb.port
-              ,task.options.couchdb.grid_merge_couchdbquery_db].join('/')
-
+    var cdb = [task.options.couchdb.host+':'+task.options.couchdb.port
+              ,task.options.couchdb.grid_merge_couchdbquery_detector_db].join('/')
     var q = queue()
-    db_files.forEach(function(db){
-        q.defer(post_file,db,cdb,detector_docs)
+    db_files.forEach(function(file){
+        q.defer(post_file,file,cdb,detector_docs)
     })
     q.await(function(err,d1,d2,d3,d4){
         should.not.exist(err)
@@ -128,12 +127,12 @@ function demo_db_before(config){
     return function(done){
         var task = {options:config}
         // dummy up a done grid and a not done grid in a test db
-        var dbs = [task.options.couchdb.grid_merge_couchdbquery_db
-                  ,task.options.couchdb.hpms_db
-                  ,task.options.couchdb.state_db
-                  ,task.options.couchdb.calvad_db]
+        var dbs = [task.options.couchdb.grid_merge_couchdbquery_detector_db
+                  ,task.options.couchdb.grid_merge_couchdbquery_hpms_db
+                  ,task.options.couchdb.grid_merge_couchdbquery_state_db
+                  ]
 
-        var q = queue()
+        var q = queue(1)
         dbs.forEach(function(db){
             if(!db) return null
             q.defer(create_tempdb,task,db)
@@ -141,7 +140,7 @@ function demo_db_before(config){
         })
         q.await(function(e){
             should.not.exist(e)
-            queue()
+            queue(1)
             .defer(load_hpms,task)
             .defer(load_detector,task)
             .await(done)
@@ -154,10 +153,11 @@ function demo_db_before(config){
 function demo_db_after(config){
     return  function(done){
         var task = {options:config}
-        var dbs = [task.options.couchdb.grid_merge_couchdbquery_db
-                  ,task.options.couchdb.hpms_db
-                  ,task.options.couchdb.state_db
-                  ,task.options.couchdb.calvad_db]
+        var dbs = [task.options.couchdb.grid_merge_couchdbquery_detector_db
+                  ,task.options.couchdb.grid_merge_couchdbquery_hpms_db
+                  ,task.options.couchdb.grid_merge_couchdbquery_state_db
+                  ]
+
 
         var q = queue()
         dbs.forEach(function(db){

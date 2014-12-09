@@ -23,27 +23,24 @@ var test_db_unique = date.getHours()+'-'
                    + date.getSeconds()+'-'
                    + date.getMilliseconds()
 
-var task
-
 var utils = require('./utils')
 var path = require('path')
 var rootdir = path.normalize(__dirname)
 var config_file = rootdir+'/../test.config.json'
-var options
+var options={}
 before(function(done){
     config_okay(config_file,function(err,c){
-        options ={'couchdb':c.couchdb}
-        options.couchdb.hpms_db += test_db_unique
-        options.couchdb.grid_merge_couchdbquery_db += test_db_unique
-        options.couchdb.state_db += test_db_unique
+        options.couchdb=c.couchdb
+        options.couchdb.grid_merge_couchdbquery_hpms_db += test_db_unique
+        options.couchdb.grid_merge_couchdbquery_detector_db += test_db_unique
+        options.couchdb.grid_merge_couchdbquery_state_db += test_db_unique
 
-        // dummy up a done grid and a not done grid in a test db
-        task = {'options':options};
         utils.demo_db_before(options)(done)
         return null
     })
     return null
 })
+
 after(function(done){
     utils.demo_db_after(options)(done)
     return null
@@ -51,6 +48,8 @@ after(function(done){
 
 
 describe('get hpms fractions',function(){
+
+    var task = {'options':options};
 
     it('can get data for a known grid',function(done){
         task.cell_id='100_223'
@@ -109,6 +108,8 @@ describe('get hpms fractions',function(){
 })
 
 describe('get detector fractions',function(){
+
+    var task = {'options':options};
 
     it('can get data for a known grid',function(done){
         task.cell_id='189_72'
