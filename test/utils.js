@@ -8,8 +8,7 @@ var should = require('should')
 
 function create_tempdb(task,db,cb){
     if(typeof db === 'function'){
-        cb = db
-        db = task.options.couchdb.grid_merge_couchdbquery_detector_db
+        throw new Error('db required now')
     }
     var cdb =
         [task.options.couchdb.host+':'+task.options.couchdb.port
@@ -26,8 +25,7 @@ function create_tempdb(task,db,cb){
 
 function delete_tempdb(task,db,cb){
     if(typeof db === 'function'){
-        cb = db
-        db = task.options.couchdb.grid_merge_couchdbquery_detector_db
+        throw new Error('db required now')
     }
     var cdb =
         [task.options.couchdb.host+':'+task.options.couchdb.port
