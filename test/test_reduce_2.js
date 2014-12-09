@@ -25,7 +25,7 @@ var path = require('path')
 var rootdir = path.normalize(__dirname)
 var config_file = rootdir+'/../test.config.json'
 
-var config={}
+var options={}
 var utils = require('./utils')
 var path = require('path')
 var rootdir = path.normalize(__dirname)
@@ -33,25 +33,24 @@ var config_file = rootdir+'/../test.config.json'
 
 before(function(done){
     config_okay(config_file,function(err,c){
-        config.couchdb=c.couchdb
-        config.couchdb.hpms_db += test_db_unique
-        config.couchdb.grid_merge_couchdbquery_db += test_db_unique
-        config.couchdb.state_db += test_db_unique
+        options.couchdb=c.couchdb
+        options.couchdb.grid_merge_couchdbquery_hpms_db += test_db_unique
+        options.couchdb.grid_merge_couchdbquery_detector_db += test_db_unique
+        options.couchdb.grid_merge_couchdbquery_state_db += test_db_unique
 
-        // dummy up a done grid and a not done grid in a test db
-        utils.demo_db_before(config)(done)
+        utils.demo_db_before(options)(done)
         return null
     })
     return null
 })
 
-after(utils.demo_db_after(config))
+after(utils.demo_db_after(options))
 
 
 
 describe('post process couch query',function(){
     it('should compute scale of not 1,1,1 for hpms data',function(done){
-        var task ={'options':config
+        var task ={'options':options
                   ,'cell_id':'100_223'
                   ,'year':2008
                   }
