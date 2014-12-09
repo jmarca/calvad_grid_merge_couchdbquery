@@ -16,15 +16,9 @@ before(function(done){
     config_okay(config_file,function(err,c){
         should.not.exist(err)
         config.couchdb =c.couchdb
-        var date = new Date()
-        var test_db_unique = date.getHours()+'-'
-                           + date.getMinutes()+'-'
-                           + date.getSeconds()+'-'
-                           + date.getMilliseconds()
 
-        config.couchdb.hpms_db += test_db_unique
-        config.couchdb.grid_merge_couchdbquery_db += test_db_unique
-        config.couchdb.state_db += test_db_unique
+// skip making a test db...just prentending like the db is empty
+
         return done()
     })
     return null
