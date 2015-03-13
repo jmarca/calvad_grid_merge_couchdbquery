@@ -17,7 +17,6 @@
 
 var cdb_interactions = require('../lib/couchdb_interactions')
 var get_hpms_fractions = cdb_interactions.get_hpms_fractions
-var flatten_records = require('../lib/flatten').flatten_records
 var reduce = require('../lib/reduce')
 var config_okay = require('config_okay')
 
