@@ -4,7 +4,7 @@ var should = require('should')
 var queue = require('queue-async')
 var _ = require('lodash')
 
-var cdb_interactions = require('../lib/couchdb_interactions')
+var cdb_interactions = require('../.')
 var filter_out_done = cdb_interactions.filter_out_done
 var mark_done = cdb_interactions.mark_done
 var in_process = cdb_interactions.mark_in_process
