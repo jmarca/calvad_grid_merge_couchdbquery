@@ -63,6 +63,21 @@ function post_file(file,couch,doclen,cb){
     return null
 }
 
+
+function put_file(file,couch,cb){
+
+    var db_dump = require(file)
+    superagent.post(couch)
+    .type('json')
+    .send(db_dump)
+    .end(function(e,r){
+        should.not.exist(e)
+        should.exist(r)
+        return cb(e)
+    })
+    return null
+}
+
 function load_hpms(task,cb){
     var db_files = ['./files/100_223_2008_JAN.json'
                    ,'./files/178_97_2008_JAN.json'
@@ -101,7 +116,7 @@ function load_detector(task,cb){
               ,task.options.couchdb.grid_merge_couchdbquery_detector_db].join('/')
     var q = queue()
     db_files.forEach(function(file){
-        q.defer(post_file,file,cdb,detector_docs)
+        q.defer(post_file,file,cdb,0)
     })
     q.await(function(err,d1,d2,d3,d4){
         should.not.exist(err)
@@ -119,6 +134,33 @@ function load_detector(task,cb){
     })
     return null
 }
+
+
+function load_area_sums(task,cb){
+    var db_files = ['./files/NC.json']
+    var cdb = [task.options.couchdb.host+':'+task.options.couchdb.port
+              ,task.options.couchdb.grid_merge_couchdbquery_put_db].join('/')
+    var q = queue()
+    db_files.forEach(function(file){
+        q.defer(put_file,file,cdb)
+    })
+    q.awaitAll(function(err,res){
+        should.not.exist(err)
+        superagent.get(cdb)
+        .type('json')
+        .end(function(e,r){
+            should.not.exist(e)
+            should.exist(r)
+            r.should.have.property('text')
+            var superagent_sucks = JSON.parse(r.text)
+            superagent_sucks.should.have.property('doc_count',1)
+            return cb()
+        })
+        return null
+    })
+    return null
+}
+
 
 
 function demo_db_before(config){
@@ -169,7 +211,7 @@ function demo_db_after(config){
     }
 }
 
-
+exports.load_area_sums = load_area_sums
 exports.load_detector = load_detector
 exports.load_hpms     = load_hpms
 exports.create_tempdb = create_tempdb
