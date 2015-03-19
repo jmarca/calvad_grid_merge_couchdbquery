@@ -69,7 +69,7 @@ describe('check_results_doc function',function(){
         cdb_interactions.check_results_doc(task,function(err,result){
             should.not.exist(err)
             should.exist(result)
-            result.should.be.ok;
+            result.should.not.be.ok;
             return done()
         })
         return null
