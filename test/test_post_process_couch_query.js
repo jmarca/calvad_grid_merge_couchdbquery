@@ -108,4 +108,20 @@ describe('post_process_hpms_couch_query',function(){
                      });
 
     })
+    it('should not crash on an empty cell',function(done){
+        var task ={'options':options
+                  ,'cell_id':'100_222'
+                  ,'year':2009
+                  }
+        queue(1)
+        .defer(get_detector_fractions,task)
+        .defer(reduce.post_process_couch_query,task)
+        .await(function(e){
+            should.not.exist(e)
+            should.exist(task)
+            console.log(task)
+            return done()
+        });
+
+    })
 })
