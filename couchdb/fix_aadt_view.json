@@ -1,0 +1,9 @@
+{
+   "_id": "_design/aadt_fixup",
+   "language": "javascript",
+   "views": {
+       "has_aadt_not_aadt_frac": {
+           "map": "function(doc) {\n  if(doc.aadt !== undefined \n     && doc.aadt_frac === undefined){\n      emit(doc._id,null);\n  }\n  return null\n}"
+       }
+   }
+}
