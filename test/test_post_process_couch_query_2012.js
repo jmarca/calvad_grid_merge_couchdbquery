@@ -80,11 +80,11 @@ describe('post_process_hpms_couch_query',function(){
             console.log(task.scale.hh)
             console.log(task.scale.nhh)
                          task.scale.n.should.be
-                         .approximately(1.0164381992, 0.00001)
+                         .approximately(1.1609, 0.0001)
                          task.scale.hh.should.be
-                         .approximately(0.9912986681, 0.00001)
+                         .approximately(1.13207, 0.0001)
                          task.scale.nhh.should.be
-                         .approximately(1.0068673223, 0.00001)
+                         .approximately(1.16378, 0.0001)
                          return done()
                      });
 
