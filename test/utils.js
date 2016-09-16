@@ -5,6 +5,7 @@ var queue=require('queue-async')
 
 var _ = require('lodash')
 var should = require('should')
+var fs = require('fs')
 
 function create_tempdb(task,db,cb){
     if(typeof db === 'function'){
@@ -41,7 +42,7 @@ function delete_tempdb(task,db,cb){
 
 var hpms_docs=0
 var detector_docs=0
-
+var viewput = require('couchdb_put_view')
 
 function post_file(file,couch,doclen,cb){
 
@@ -59,6 +60,19 @@ function post_file(file,couch,doclen,cb){
         should.not.exist(e)
         should.exist(r)
         return cb(null,doclen)
+    })
+    return null
+}
+
+
+function put_view(viewfile,config,cb){
+    fs.readFile(viewfile, function (err, data) {
+        var design_doc;
+        var opts;
+        if (err) throw err;
+        opts = _.assign({},config,{'doc':JSON.parse(data)})
+        viewput(opts,cb)
+        return null
     })
     return null
 }
@@ -183,8 +197,11 @@ function demo_db_before(config){
         q.await(function(e){
             should.not.exist(e)
             queue(1)
-            .defer(load_hpms,task)
-            .defer(load_detector,task)
+                .defer(load_hpms,task)
+                .defer(load_detector,task)
+                .defer(put_view,
+                       './lib/couchdb_view.json',
+                       _.assign(config.couchdb,{'db':dbs[0]}))
             .await(done)
             return null
         })
