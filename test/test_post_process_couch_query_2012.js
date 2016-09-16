@@ -25,7 +25,7 @@ var get_detector_fractions = cdb_interactions.get_detector_fractions
 
 var should = require('should')
 
-var queue = require('queue-async')
+var queue = require('d3-queue').queue
 var _ = require('lodash')
 var utils = require('./utils')
 var path = require('path')

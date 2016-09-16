@@ -2,7 +2,7 @@
 
 var should = require('should')
 
-var queue = require('queue-async')
+var queue = require('d3-queue').queue
 var _ = require('lodash')
 
 var cdb_interactions = require('../lib/couchdb_interactions')

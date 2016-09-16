@@ -2,7 +2,7 @@
 
 var should = require('should')
 
-var queue = require('queue-async')
+var queue = require('d3-queue').queue
 var _ = require('lodash')
 
 var cdb_interactions = require('../lib/couchdb_interactions')
@@ -10,6 +10,7 @@ var filter_grids = cdb_interactions.filter_out_done
 var mark_done = cdb_interactions.mark_done
 var in_process = cdb_interactions.mark_in_process
 var get_hpms_fractions = cdb_interactions.get_hpms_fractions
+var get_hpms_fractions_one_hour = cdb_interactions.get_hpms_fractions_one_hour
 var get_detector_fractions = cdb_interactions.get_detector_fractions
 
 var fs = require('fs')
@@ -199,5 +200,49 @@ describe('get detector fractions',function(){
             })
         })
     })
+
+
+})
+
+
+
+describe('get hpms fractions',function(){
+
+    it('can get data for a known time',function(done){
+        var task = {'options':_.clone(options,true)}
+        task.ts="2008-01-21 18:00"
+        get_hpms_fractions_one_hour(task,function(err,task){
+            should.not.exist(err)
+            should.exist(task)
+            //console.log(task)
+            task.should.have.property('hpms_fractions')
+            _.keys(task.hpms_fractions).length.should.eql(3)
+            task.should.have.property('hpms_fractions_cells')
+            task.hpms_fractions_cells.should.eql(3)
+            _.each(task.hpms_fractions,function(record){
+                record.should.have.keys('n','hh','nhh')
+            })
+            return done()
+        })
+    })
+    it('can get data for a known time, 2012',function(done){
+        var task = {'options':_.clone(options,true)}
+        task.ts="2012-01-21 18:00"
+        get_hpms_fractions_one_hour(task,function(err,task){
+            should.not.exist(err)
+            should.exist(task)
+            //console.log(task)
+            task.should.have.property('hpms_fractions')
+            _.keys(task.hpms_fractions).length.should.eql(1)
+            task.should.have.property('hpms_fractions_cells')
+            task.hpms_fractions_cells.should.eql(1)
+            _.each(task.hpms_fractions,function(record){
+                record.should.have.keys('n','hh','nhh')
+            })
+            return done()
+        })
+    })
+
+
 
 })
