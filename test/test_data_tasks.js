@@ -137,6 +137,9 @@ describe('get detector fractions',function(){
             task.should.have.property('detector_fractions_sums')
             task.should.have.property('detector_fractions_hours',utils.detector_docs)
             //console.log(task)
+            _.each(task.detector_fractions,function(record){
+                record.should.have.keys('n','hh','nhh')
+            })
             return done()
         })
     })
@@ -262,7 +265,49 @@ describe('get detector fractions',function(){
             task.should.have.property('detector_fractions_cells')
             task.detector_fractions_cells.should.eql(3)
             _.each(task.detector_fractions,function(record){
-                record.should.have.keys('n','hh','not_hh')
+                record.should.have.keys('n','hh','nhh')
+            })
+            task.should.have.property('detector_data')
+            _.size(task.detector_data).should.be.eql(3)
+            _.each(task.detector_data,function(record,cellid){
+                record.should.be.instanceOf(Array)
+                record.should.be.instanceOf(Array)
+                record.forEach(function (entry){
+                    entry.should.be.instanceOf(Array)
+                    entry.length.should.be.above(16)
+                    return null
+                })
+                return null
+            })
+            return done()
+        })
+    })
+
+    it('can get data for a known time in 2012',function(done){
+        var task = {'options':_.clone(options,true)}
+        task.ts="2012-01-21 18:00"
+        get_detector_fractions_one_hour(task,function(err,task){
+            should.not.exist(err)
+            should.exist(task)
+            //console.log(task)
+            task.should.have.property('detector_fractions')
+            _.keys(task.detector_fractions).length.should.eql(1)
+            task.should.have.property('detector_fractions_cells')
+            task.detector_fractions_cells.should.eql(1)
+            _.each(task.detector_fractions,function(record){
+                record.should.have.keys('n','hh','nhh')
+                return null
+            })
+            task.should.have.property('detector_data')
+            _.size(task.detector_data).should.be.eql(1)
+            _.each(task.detector_data,function(record,cellid){
+                record.should.be.instanceOf(Array)
+                record.forEach(function (entry){
+                    entry.should.be.instanceOf(Array)
+                    entry.length.should.be.above(16)
+                    return null
+                })
+                return null
             })
             return done()
         })
