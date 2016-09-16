@@ -201,7 +201,7 @@ function demo_db_before(config){
                 .defer(load_detector,task)
                 .defer(put_view,
                        './lib/couchdb_view.json',
-                       _.assign(config.couchdb,{'db':dbs[0]}))
+                       _.assign({},config.couchdb,{'db':dbs[0]}))
             .await(done)
             return null
         })
