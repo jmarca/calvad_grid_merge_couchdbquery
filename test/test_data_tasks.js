@@ -248,24 +248,24 @@ describe('get hpms fractions',function(){
 
 })
 
-// describe('get detector fractions',function(){
+describe('get detector fractions',function(){
 
-//     it('can get data for a known time',function(done){
-//         var task = {'options':_.clone(options,true)}
-//         task.ts="2008-01-21 18:00"
-//         get_detector_fractions_one_hour(task,function(err,task){
-//             should.not.exist(err)
-//             should.exist(task)
-//             //console.log(task)
-//             task.should.have.property('hpms_fractions')
-//             _.keys(task.hpms_fractions).length.should.eql(3)
-//             task.should.have.property('hpms_fractions_cells')
-//             task.hpms_fractions_cells.should.eql(3)
-//             _.each(task.hpms_fractions,function(record){
-//                 record.should.have.keys('n','hh','nhh')
-//             })
-//             return done()
-//         })
-//     })
+    it('can get data for a known time',function(done){
+        var task = {'options':_.clone(options,true)}
+        task.ts="2008-01-21 18:00"
+        get_detector_fractions_one_hour(task,function(err,task){
+            should.not.exist(err)
+            should.exist(task)
+            //console.log(task)
+            task.should.have.property('detector_fractions')
+            _.keys(task.detector_fractions).length.should.eql(3)
+            task.should.have.property('detector_fractions_cells')
+            task.detector_fractions_cells.should.eql(3)
+            _.each(task.detector_fractions,function(record){
+                record.should.have.keys('n','hh','not_hh')
+            })
+            return done()
+        })
+    })
 
-// })
+})
