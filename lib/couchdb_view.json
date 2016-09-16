@@ -1,0 +1,9 @@
+{
+   "_id": "_design/by_hour",
+   "language": "javascript",
+   "views": {
+       "hour_id_aadt_frac": {
+           "map": "function(doc) {\n  var id_match = /(\\d*_\\d*)_(\\d*-0?\\d*-0?\\d*\\s*\\d\\d:\\d\\d)/.exec(doc._id)\n  if (id_match){\n      emit([id_match[2],id_match[1]], doc.aadt_frac)\n  }\n  return null}"
+       }
+   }
+}

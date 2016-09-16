@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha",
     "jsdoc": "jsdoc -c .jsdoc.json",
-    "lint": "eslint lib/*.js"
+    "lint": "eslint lib/*.js",
+    "cdbview":"node ./node_modules/couchdb_put_view/put_view.js -c putview.config.json -v ./lib/couchdb_view.json"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,7 @@
     "couchdb_bulkdoc_saver": "git://github.com/jmarca/couchdb_bulkdoc_saver.git",
     "couchdb_get_views": "git://github.com/jmarca/couchdb_get_views.git",
     "couchdb_put_doc": "git://github.com/jmarca/couchdb_put_doc.git",
+    "couchdb_put_view": "github:jmarca/couchdb_put_view",
     "d3-queue": "^3.0.3",
     "lodash": ""
   }

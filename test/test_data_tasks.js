@@ -12,6 +12,7 @@ var in_process = cdb_interactions.mark_in_process
 var get_hpms_fractions = cdb_interactions.get_hpms_fractions
 var get_hpms_fractions_one_hour = cdb_interactions.get_hpms_fractions_one_hour
 var get_detector_fractions = cdb_interactions.get_detector_fractions
+var get_detector_fractions_one_hour = cdb_interactions.get_detector_fractions_one_hour
 
 var fs = require('fs')
 var superagent=require('superagent')
@@ -244,5 +245,27 @@ describe('get hpms fractions',function(){
     })
 
 
+
+})
+
+describe('get detector fractions',function(){
+
+    it('can get data for a known time',function(done){
+        var task = {'options':_.clone(options,true)}
+        task.ts="2008-01-21 18:00"
+        get_detector_fractions_one_hour(task,function(err,task){
+            should.not.exist(err)
+            should.exist(task)
+            //console.log(task)
+            task.should.have.property('detector_fractions')
+            _.keys(task.detector_fractions).length.should.eql(3)
+            task.should.have.property('detector_fractions_cells')
+            task.detector_fractions_cells.should.eql(3)
+            _.each(task.detector_fractions,function(record){
+                record.should.have.keys('n','hh','not_hh')
+            })
+            return done()
+        })
+    })
 
 })
