@@ -7,6 +7,8 @@ exports.mark_done= cdbi.mark_done
 exports.mark_in_process= cdbi.in_process
 exports.get_hpms_fractions= cdbi.get_hpms_fractions
 exports.get_detector_fractions= cdbi.get_detector_fractions
+exports.get_hpms_fractions_one_hour= cdbi.get_hpms_fractions_one_hour
+exports.get_detector_fractions_one_hour= cdbi.get_detector_fractions_one_hour
 exports.put_results_doc= cdbi.put_results_doc
 exports.check_results_doc= cdbi.check_results_doc
 
@@ -14,3 +16,4 @@ exports.check_results_doc= cdbi.check_results_doc
 exports.all_tasks=mmap.all_tasks
 
 exports.post_process_couch_query=reduce.post_process_couch_query
+exports.post_process_couch_query_one_hour=reduce.post_process_couch_query_one_hour
