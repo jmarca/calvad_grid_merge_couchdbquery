@@ -202,6 +202,9 @@ function demo_db_before(config){
                 .defer(put_view,
                        './lib/couchdb_view.json',
                        _.assign({},config.couchdb,{'db':dbs[0]}))
+                .defer(put_view,
+                       './lib/couchdb_hpms_view.json',
+                       _.assign({},config.couchdb,{'db':dbs[1]}))
             .await(done)
             return null
         })
