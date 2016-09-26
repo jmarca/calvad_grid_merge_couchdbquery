@@ -23,6 +23,12 @@ var get_hpms_fractions_one_hour = cdb_interactions.get_hpms_fractions_one_hour
 var get_detector_fractions = cdb_interactions.get_detector_fractions
 var get_detector_fractions_one_hour = cdb_interactions.get_detector_fractions_one_hour
 
+var mylib = require('../.')
+var bget_hpms_fractions = mylib.get_hpms_fractions
+var bget_hpms_fractions_one_hour = mylib.get_hpms_fractions_one_hour
+var bget_detector_fractions = mylib.get_detector_fractions
+var bget_detector_fractions_one_hour = mylib.get_detector_fractions_one_hour
+
 var path = require('path')
 var rootdir = path.normalize(__dirname)
 var config_file = rootdir+'/../test.config.json'
@@ -78,8 +84,8 @@ describe('post process couch query',function(){
                    ,'ts':"2008-01-11 15:00"
                   }
         queue(1)
-        .defer(get_detector_fractions_one_hour,task)
-        .defer(get_hpms_fractions_one_hour,task)
+        .defer(bget_detector_fractions_one_hour,task)
+        .defer(bget_hpms_fractions_one_hour,task)
         .defer(reduce.post_process_couch_query_one_hour,task)
         .await(function(e,t1,t2,t3){
             should.not.exist(e)

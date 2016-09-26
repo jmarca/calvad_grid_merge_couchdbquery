@@ -1,4 +1,4 @@
-var cdbi = require('./lib/couchdb_interactions.js')
+var cdbi = require('./lib/couchdb_interactions')
 var mmap = require('./lib/make_map.js')
 var reduce = require('./lib/reduce.js')
 
@@ -7,7 +7,7 @@ exports.mark_done= cdbi.mark_done
 exports.mark_in_process= cdbi.in_process
 exports.get_hpms_fractions= cdbi.get_hpms_fractions
 exports.get_detector_fractions= cdbi.get_detector_fractions
-exports.get_hpms_fractions_one_hour= cdbi.get_hpms_fractions_one_hour_V2
+exports.get_hpms_fractions_one_hour= cdbi.get_hpms_fractions_one_hour
 exports.get_detector_fractions_one_hour= cdbi.get_detector_fractions_one_hour
 exports.put_results_doc= cdbi.put_results_doc
 exports.check_results_doc= cdbi.check_results_doc
