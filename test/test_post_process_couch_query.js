@@ -85,43 +85,43 @@ describe('post_process_hpms_couch_query',function(){
                      });
 
     })
-    it('should correctly post process a couch detector result',function(done){
-        var task ={'options':options
-                  ,'cell_id':'189_72'
-                  ,'year':2008
-                  }
-        task.should.not.have.property('scale')
-        queue(1)
-        .defer(get_detector_fractions,task)
-        .defer(reduce.post_process_couch_query,task)
-        .await(function(e){
-                         should.not.exist(e)
-                         should.exist(task)
-                         task.should.have.property('scale')
-                         task.scale.n.should.be
-                         .approximately(1.0, 0.00001)
-                         task.scale.hh.should.be
-                         .approximately(1.0, 0.00001)
-                         task.scale.nhh.should.be
-                         .approximately(1.0, 0.00001)
-                         return done()
-                     });
+    // it('should correctly post process a couch detector result',function(done){
+    //     var task ={'options':options
+    //               ,'cell_id':'189_72'
+    //               ,'year':2008
+    //               }
+    //     task.should.not.have.property('scale')
+    //     queue(1)
+    //     .defer(get_detector_fractions,task)
+    //     .defer(reduce.post_process_couch_query,task)
+    //     .await(function(e){
+    //                      should.not.exist(e)
+    //                      should.exist(task)
+    //                      task.should.have.property('scale')
+    //                      task.scale.n.should.be
+    //                      .approximately(1.0, 0.00001)
+    //                      task.scale.hh.should.be
+    //                      .approximately(1.0, 0.00001)
+    //                      task.scale.nhh.should.be
+    //                      .approximately(1.0, 0.00001)
+    //                      return done()
+    //                  });
 
-    })
-    it('should not crash on an empty cell',function(done){
-        var task ={'options':options
-                  ,'cell_id':'100_222'
-                  ,'year':2009
-                  }
-        queue(1)
-        .defer(get_detector_fractions,task)
-        .defer(reduce.post_process_couch_query,task)
-        .await(function(e){
-            should.not.exist(e)
-            should.exist(task)
-            console.log(task)
-            return done()
-        });
+    // })
+    // it('should not crash on an empty cell',function(done){
+    //     var task ={'options':options
+    //               ,'cell_id':'100_222'
+    //               ,'year':2009
+    //               }
+    //     queue(1)
+    //     .defer(get_detector_fractions,task)
+    //     .defer(reduce.post_process_couch_query,task)
+    //     .await(function(e){
+    //         should.not.exist(e)
+    //         should.exist(task)
+    //         console.log(task)
+    //         return done()
+    //     });
 
-    })
+    // })
 })
