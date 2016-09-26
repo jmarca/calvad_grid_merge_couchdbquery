@@ -75,10 +75,6 @@ describe('post_process_hpms_couch_query',function(){
                          should.not.exist(e)
                          should.exist(task)
             task.should.have.property('scale')
-            console.log(task.scale)
-            console.log(task.scale.n)
-            console.log(task.scale.hh)
-            console.log(task.scale.nhh)
                          task.scale.n.should.be
                          .approximately(1.1609, 0.0001)
                          task.scale.hh.should.be
