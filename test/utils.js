@@ -210,6 +210,12 @@ function demo_db_before(config){
                 .defer(put_view,
                        './lib/couchdb_hpms_view.json',
                        _.assign({},config.couchdb,{'db':dbs[1]}))
+                .defer(put_view,
+                       './lib/couchdb_view.json',
+                       _.assign({},config.couchdb,{'db':dbs[0]+'%2f2012'}))
+                .defer(put_view,
+                       './lib/couchdb_hpms_view.json',
+                       _.assign({},config.couchdb,{'db':dbs[1]+'%2f2012'}))
             .await(done)
             return null
         })
@@ -230,6 +236,8 @@ function demo_db_after(config){
         dbs.forEach(function(db){
             if(!db) return null
             q.defer(delete_tempdb,task,db)
+            // also the 2012 dbs
+            q.defer(delete_tempdb,task,db+'%2f2012')
             return null
         })
         q.await(done)

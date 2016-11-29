@@ -67,6 +67,7 @@ describe('post_process_hpms_couch_query',function(){
                   ,'cell_id':'100_223'
                   ,'year':2008
                   }
+        console.log(task)
         task.should.not.have.property('scale')
         queue(1)
         .defer(get_hpms_fractions,task)

@@ -111,7 +111,7 @@ describe('post_process_hpms_couch_query',function(){
     it('should not crash on an empty cell',function(done){
         var task ={'options':options
                   ,'cell_id':'100_222'
-                  ,'year':2009
+                  ,'year':2012
                   }
         queue(1)
         .defer(get_detector_fractions,task)
