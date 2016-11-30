@@ -18,10 +18,9 @@
 var cdb_interactions = require('../lib/couchdb_interactions')
 var get_hpms_fractions = cdb_interactions.get_hpms_fractions
 var reduce = require('../lib/reduce')
-var config_okay = require('config_okay')
-
 var get_detector_fractions = cdb_interactions.get_detector_fractions
 
+var config_okay = require('config_okay')
 
 var should = require('should')
 
