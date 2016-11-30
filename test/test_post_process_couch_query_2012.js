@@ -52,7 +52,7 @@ before(function(done){
     })
     return null
 })
-//after(utils.demo_db_after(options))
+after(utils.demo_db_after(options))
 
 describe('post_process_hpms_couch_query',function(){
 

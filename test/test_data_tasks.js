@@ -44,10 +44,7 @@ before(function(done){
     return null
 })
 
-// after(function(done){
-//     utils.demo_db_after(options)(done)
-//     return null
-// })
+after(utils.demo_db_after(options))
 
 
 describe('get hpms fractions grid',function(){
