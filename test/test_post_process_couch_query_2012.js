@@ -37,18 +37,13 @@ var date = new Date()
 var test_db_unique = date.getHours()+'-'
                    + date.getMinutes()+'-'
                    + date.getSeconds()+'-'
-                   + date.getMilliseconds()
+                   + date.getMilliseconds()+'-'+Math.floor(Math.random() * 100)
 
 var options = {}
-var date = new Date()
-var test_db_unique = date.getHours()+'-'
-                   + date.getMinutes()+'-'
-                   + date.getSeconds()+'-'
-                   + date.getMilliseconds()
 
 before(function(done){
     config_okay(config_file,function(err,c){
-        options.couchdb=c.couchdb
+        options.couchdb= _.extend({},c.couchdb)
         options.couchdb.grid_merge_couchdbquery_hpms_db += test_db_unique
         options.couchdb.grid_merge_couchdbquery_detector_db += test_db_unique
         options.couchdb.grid_merge_couchdbquery_state_db += test_db_unique

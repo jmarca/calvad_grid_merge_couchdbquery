@@ -13,7 +13,7 @@ var date = new Date()
 var test_db_unique = date.getHours()+'-'
                    + date.getMinutes()+'-'
                    + date.getSeconds()+'-'
-                   + date.getMilliseconds()
+                   + date.getMilliseconds()+'-'+Math.floor(Math.random() * 100)
 
 var utils = require('./utils')
 var superagent = require('superagent')
@@ -34,14 +34,10 @@ var rootdir = path.normalize(__dirname)
 var config_file = rootdir+'/../test.config.json'
 
 var options={}
-var utils = require('./utils')
-var path = require('path')
-var rootdir = path.normalize(__dirname)
-var config_file = rootdir+'/../test.config.json'
 
 before(function(done){
     config_okay(config_file,function(err,c){
-        options.couchdb=c.couchdb
+        options.couchdb=_.extend({},c.couchdb)
         options.couchdb.grid_merge_couchdbquery_hpms_db += test_db_unique
         options.couchdb.grid_merge_couchdbquery_detector_db += test_db_unique
         options.couchdb.grid_merge_couchdbquery_state_db += test_db_unique

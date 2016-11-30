@@ -23,7 +23,8 @@ var date = new Date()
 var test_db_unique = date.getHours()+'-'
                    + date.getMinutes()+'-'
                    + date.getSeconds()+'-'
-                   + date.getMilliseconds()
+                   + date.getMilliseconds()+'-'+Math.floor(Math.random() * 100)
+
 
 var utils = require('./utils')
 var path = require('path')
@@ -32,7 +33,7 @@ var config_file = rootdir+'/../test.config.json'
 var options={}
 before(function(done){
     config_okay(config_file,function(err,c){
-        options.couchdb=c.couchdb
+        options.couchdb=_.extend({},c.couchdb)
         options.couchdb.grid_merge_couchdbquery_hpms_db += test_db_unique
         options.couchdb.grid_merge_couchdbquery_detector_db += test_db_unique
         options.couchdb.grid_merge_couchdbquery_state_db += test_db_unique
@@ -43,10 +44,10 @@ before(function(done){
     return null
 })
 
-after(function(done){
-    utils.demo_db_after(options)(done)
-    return null
-})
+// after(function(done){
+//     utils.demo_db_after(options)(done)
+//     return null
+// })
 
 
 describe('get hpms fractions grid',function(){
