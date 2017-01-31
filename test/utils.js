@@ -255,3 +255,4 @@ exports.hpms_docs     = 744 // 24 hours, 31 days
 exports.detector_docs = 744
 exports.demo_db_after = demo_db_after
 exports.demo_db_before= demo_db_before
+exports.put_view      = put_view

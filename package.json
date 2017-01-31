@@ -31,7 +31,7 @@
     "config_okay": "",
     "couch_check_state": "git://github.com/jmarca/couch_check_state.git",
     "couch_set_state": "git://github.com/jmarca/couch_set_state.git",
-    "couchdb_bulkdoc_saver": "git://github.com/jmarca/couchdb_bulkdoc_saver.git",
+    "couchdb_bulkdoc_saver": "github:jmarca/couchdb_bulkdoc_saver",
     "couchdb_get_views": "git://github.com/jmarca/couchdb_get_views.git",
     "couchdb_put_doc": "git://github.com/jmarca/couchdb_put_doc.git",
     "couchdb_put_view": "github:jmarca/couchdb_put_view",
